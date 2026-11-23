@@ -1,0 +1,18 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_FAMILY_ASR
+
+config NUM_IRQS
+	default 32
+
+# The IMO comes up at its SFLASH-trimmed default of 48 MHz; soc_early_init_hook
+# (selected via SOC_EARLY_INIT_HOOK) refreshes SystemCoreClock from the live
+# clock registers. Zephyr has no runtime timer-frequency support, so this value
+# must match the actual core clock for the lifetime of the application: do not
+# retrim the IMO with asr_clock_imo_set_freq() after startup, or SysTick and all
+# cycle-based timeouts will be scaled incorrectly.
+config SYS_CLOCK_HW_CYCLES_PER_SEC
+	default 48000000
+
+endif # SOC_FAMILY_ASR

@@ -1,0 +1,4 @@
+family:
+  - name: asr
+    socs:
+      - name: asr6502

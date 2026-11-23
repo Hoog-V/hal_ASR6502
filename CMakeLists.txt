@@ -12,6 +12,9 @@ if(CONFIG_HAS_ASR6502_SDK)
     src/bsp_delay.c
     src/bsp_io.c
     src/bsp_irq.c
+    src/bsp_sar.c
     src/system_asr6502.c
   )
+
+  zephyr_library_sources_ifdef(CONFIG_GPIO_ASR6502 drivers/gpio/gpio_asr6502.c)
 endif()

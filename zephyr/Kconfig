@@ -5,3 +5,5 @@ config HAS_ASR6502_SDK
 	bool
 	help
 	  Build the ASR6502 HAL (BSP) sources. Selected by an ASR6502-based SoC.
+
+rsource "../drivers/gpio/Kconfig"

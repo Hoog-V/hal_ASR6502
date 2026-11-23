@@ -1,0 +1,10 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_FAMILY_ASR
+	select ARM
+	select CPU_CORTEX_M0PLUS
+	select CPU_CORTEX_M_HAS_SYSTICK
+	select CPU_CORTEX_M_HAS_VTOR
+	select HAS_ASR6502_SDK
+	select SOC_EARLY_INIT_HOOK

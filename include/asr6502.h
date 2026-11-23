@@ -135,11 +135,17 @@ typedef enum IRQn
 #define ASR_GPIO_INTR_CFG         (0x0CUL)   /* Edge select */
 #define ASR_GPIO_INTR             (0x10UL)   /* Interrupt status */
 
-/* SAR ADC register offsets (single-ended read path). */
-#define ASR_SAR_CTRL              (0x0004UL) /* Control; bit 16 = firmware start */
-#define ASR_SAR_CHAN_CONFIG       (0x0080UL) /* Channel input routing */
-#define ASR_SAR_RESULT            (0x0180UL) /* Channel 0 result */
-#define ASR_SAR_INTR              (0x0210UL) /* End-of-conversion status */
+/* SAR ADC register offsets (from ASR_SAR_BASE). CHAN_CONFIG/CHAN_RESULT are [16]. */
+#define ASR_SAR_CTRL              (0x0000UL) /* Analog control: ENABLED bit31, VREF_SEL[6:4] */
+#define ASR_SAR_SAMPLE_CTRL       (0x0004UL) /* Sample control: CONTINUOUS bit16 */
+#define ASR_SAR_SAMPLE_TIME01     (0x0010UL) /* Sample times ST0 [9:0], ST1 [25:16] */
+#define ASR_SAR_CHAN_EN           (0x0020UL) /* Per-channel enable bits */
+#define ASR_SAR_START_CTRL        (0x0024UL) /* FW_TRIGGER bit0 (one-shot start) */
+#define ASR_SAR_CHAN_CONFIG       (0x0080UL) /* [16]: PIN_ADDR[3:0], PORT_ADDR[7:4], AVG_EN bit10 */
+#define ASR_SAR_CHAN_RESULT       (0x0180UL) /* [16]: RESULT[15:0] */
+#define ASR_SAR_INTR              (0x0210UL) /* EOS_INTR bit0 (end of scan) */
+#define ASR_SAR_INTR_MASK         (0x0218UL) /* EOS interrupt mask bit0 */
+#define ASR_SAR_MUX_SWITCH0       (0x0300UL) /* FW switches: Pn->Vplus bit n, VSSA->Vminus bit16 */
 
 /***********************************************************************************************************************
  * SRSSLT clock registers (offsets from ASR_SRSSLT_BASE)

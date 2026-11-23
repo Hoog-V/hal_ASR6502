@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2025 hal_ASR6502 contributors
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <arm/armv6-m.dtsi>
+#include <mem.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-m0+";
+			reg = <0>;
+		};
+	};
+
+	sram0: memory@20000000 {
+		compatible = "mmio-sram";
+		reg = <0x20000000 DT_SIZE_K(16)>;
+	};
+
+	soc {
+		flash0: flash@0 {
+			compatible = "soc-nv-flash";
+			reg = <0x0 DT_SIZE_K(128)>;
+		};
+
+		gpio0: gpio@40040000 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040000 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio1: gpio@40040100 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040100 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio2: gpio@40040200 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040200 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio3: gpio@40040300 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040300 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio4: gpio@40040400 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040400 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio5: gpio@40040500 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040500 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio6: gpio@40040600 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040600 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+
+		gpio7: gpio@40040700 {
+			compatible = "asr,asr6502-gpio";
+			reg = <0x40040700 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <8>;
+			status = "disabled";
+		};
+	};
+};
+
+&nvic {
+	arm,num-irq-priority-bits = <2>;
+};

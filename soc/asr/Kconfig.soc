@@ -1,0 +1,17 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_FAMILY_ASR
+	bool
+
+config SOC_FAMILY
+	default "asr" if SOC_FAMILY_ASR
+
+config SOC_ASR6502
+	bool
+	select SOC_FAMILY_ASR
+	help
+	  ASR6502: Arm Cortex-M0+ (PSoC 4100S core) with an integrated SX126x radio.
+
+config SOC
+	default "asr6502" if SOC_ASR6502
