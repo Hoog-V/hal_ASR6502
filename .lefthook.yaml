@@ -1,0 +1,33 @@
+pre-commit:
+  commands:
+    lint-markdown:
+      glob: "**/*.md"
+      skip:
+        - merge
+        - rebase
+        - squash
+      run: pixi run markdownlint-cli2 {staged_files}
+
+prepare-commit-msg:
+  commands:
+    signoff:
+      skip:
+        - merge
+        - rebase
+        - squash
+      run: python scripts/pre_commit_msg/check_commit_sign_off.py {1} {2}
+
+commit-msg:
+  commands:
+    template_checker:
+      skip:
+        - merge
+        - rebase
+        - squash
+      run: python scripts/commit_msg/template_checker.py {1}
+
+post-checkout:
+  commands:
+    validate-branch-name:
+      interactive: true
+      run: python scripts/post_checkout/post_checkout.py {1} {2} {3}

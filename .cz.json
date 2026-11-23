@@ -1,0 +1,32 @@
+{
+  "commitizen": {
+    "name": "cz_customize",
+    "customize": {
+      "message_template": "{{area}}: {{subject}}\n\n{% if body %}{{body}}\n\n{% endif %}{% if fixes %}Fixes #{{fixes}}\n{% endif %}",
+      "questions": [
+        {
+          "type": "input",
+          "name": "area",
+          "message": "Area prefix (subsystem the change touches, e.g. 'drivers: gpio', 'bsp: clocks', 'cmake', 'doc'):"
+        },
+        {
+          "type": "input",
+          "name": "subject",
+          "message": "Short description (imperative, capitalized, no trailing period; keep the whole subject line under 72 chars):"
+        },
+        {
+          "type": "input",
+          "name": "body",
+          "message": "Longer explanation of what and why (optional, wrap at 75 cols; leave blank to skip):"
+        },
+        {
+          "type": "input",
+          "name": "fixes",
+          "message": "Issue number this commit fixes (digits only; optional, leave blank if none):"
+        }
+      ],
+      "example": "drivers: gpio: Add open-drain drive mode\n\nAllow pins to be configured for open-drain operation so external\npull-ups can be used on the bus.\n\nFixes #42\nSigned-off-by: Victor Hogeweij <victor@example.com>",
+      "schema_pattern": "^[A-Za-z0-9_][A-Za-z0-9 _./-]*: .+"
+    }
+  }
+}

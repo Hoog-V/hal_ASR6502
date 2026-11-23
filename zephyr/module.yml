@@ -1,0 +1,4 @@
+name: hal_asr6502
+build:
+  cmake: .
+  kconfig: zephyr/Kconfig
