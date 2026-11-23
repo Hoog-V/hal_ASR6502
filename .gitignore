@@ -50,6 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+*.pyc.*
 
 # debug information files
 *.dwo
+*/__pycache__/*

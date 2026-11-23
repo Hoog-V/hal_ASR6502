@@ -1,0 +1,7 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config HAS_ASR6502_SDK
+	bool
+	help
+	  Build the ASR6502 HAL (BSP) sources. Selected by an ASR6502-based SoC.
