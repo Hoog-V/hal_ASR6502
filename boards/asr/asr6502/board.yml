@@ -1,0 +1,9 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+board:
+  name: asr6502
+  full_name: ASR6502
+  vendor: asr
+  socs:
+    - name: asr6502

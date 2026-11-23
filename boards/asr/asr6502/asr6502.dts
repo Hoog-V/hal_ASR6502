@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2025 hal_ASR6502 contributors
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <asr/asr6502.dtsi>
+
+/ {
+	model = "ASR Microelectronics ASR6502 board";
+	compatible = "asr,asr6502";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		/* RGB LED on P7.0 (red), P7.1 (green), P7.2 (blue). */
+		led_red: led_0 {
+			gpios = <&gpio7 0 GPIO_ACTIVE_HIGH>;
+		};
+
+		led_green: led_1 {
+			gpios = <&gpio7 1 GPIO_ACTIVE_HIGH>;
+		};
+
+		led_blue: led_2 {
+			gpios = <&gpio7 2 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	aliases {
+		led0 = &led_red;
+	};
+};
+
+&gpio7 {
+	status = "okay";
+};

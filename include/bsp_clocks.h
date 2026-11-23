@@ -59,7 +59,13 @@ void asr_clock_sysclk_update(void);
 
 /* Program the IMO to the given frequency (loads the SFLASH trim and performs the
  * glitch-free step sequence), then refresh SystemCoreClock. No effect if the IMO
- * is disabled. */
+ * is disabled.
+ *
+ * Warning: under Zephyr the SysTick rate is fixed at boot from
+ * CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC (the 48 MHz boot default). Retrimming the
+ * IMO after the timer is running breaks cycle-based timing; only call this
+ * function before scheduler/timer init or disable it for clock changes that
+ * affect the core. */
 void asr_clock_imo_set_freq(asr_clock_imo_freq_t freq);
 
 /* Current SYSCLK (SystemCoreClock) in Hz. */

@@ -27,8 +27,10 @@ void asr_delay_cycles(uint32_t cycles)
     }
 
     __asm volatile (
+        ".syntax unified \n"
         "1: subs %0, %0, #1 \n"
         "   bne  1b         \n"
+        ".syntax divided \n"
         : "+r" (loops)
         :
         : "cc");
