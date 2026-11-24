@@ -1,0 +1,18 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: ASR6502 SCB SPI master (polling, 8-bit, MSB first).
+
+compatible: "asr,asr6502-spi"
+
+include: [spi-controller.yaml, pinctrl-device.yaml]
+
+properties:
+  reg:
+    required: true
+
+  pinctrl-0:
+    required: true
+
+  pinctrl-names:
+    required: true

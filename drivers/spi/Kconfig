@@ -1,0 +1,12 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config SPI_ASR6502
+	bool "ASR6502 SCB SPI driver"
+	default y
+	depends on SPI
+	depends on DT_HAS_ASR_ASR6502_SPI_ENABLED
+	select PINCTRL
+	help
+	  Enable the polling SCB SPI master driver for the ASR6502 (the on-die
+	  SX126x radio bus).

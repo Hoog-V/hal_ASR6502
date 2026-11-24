@@ -25,4 +25,7 @@ if(CONFIG_HAS_ASR6502_SDK)
   zephyr_library_sources_ifdef(CONFIG_WDT_ASR6502 drivers/watchdog/wdt_asr6502.c)
   zephyr_library_sources_ifdef(CONFIG_UART_ASR6502 drivers/serial/uart_asr6502.c)
   zephyr_library_sources_ifdef(CONFIG_PINCTRL drivers/pinctrl/pinctrl_asr6502.c)
+  zephyr_library_sources_ifdef(CONFIG_SPI_ASR6502 drivers/spi/spi_asr6502.c)
+  # spi_context.h lives in the Zephyr SPI driver tree, not a global include dir.
+  zephyr_include_directories_ifdef(CONFIG_SPI_ASR6502 ${ZEPHYR_BASE}/drivers/spi)
 endif()

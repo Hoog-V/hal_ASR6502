@@ -160,6 +160,16 @@
 			reg = <0x40020000 0x2000>;
 		};
 
+		/* SCB0 is wired to the on-die SX126x radio as an SPI master. */
+		scb0: spi@40240000 {
+			compatible = "asr,asr6502-spi";
+			reg = <0x40240000 0x10000>;
+			interrupts = <7 0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+
 		scb1: uart@40250000 {
 			compatible = "asr,asr6502-uart";
 			reg = <0x40250000 0x10000>;
