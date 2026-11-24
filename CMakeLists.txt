@@ -20,4 +20,5 @@ if(CONFIG_HAS_ASR6502_SDK)
   zephyr_library_sources_ifdef(CONFIG_ADC_ASR6502 drivers/adc/adc_asr6502.c)
   # adc_context.h lives in the Zephyr ADC driver tree, not a global include dir.
   zephyr_include_directories_ifdef(CONFIG_ADC_ASR6502 ${ZEPHYR_BASE}/drivers/adc)
+  zephyr_library_sources_ifdef(CONFIG_COUNTER_ASR6502 drivers/counter/counter_asr6502.c)
 endif()

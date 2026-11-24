@@ -139,6 +139,13 @@
 			status = "disabled";
 		};
 
+		wdt_counter: counter@40030000 {
+			compatible = "asr,asr6502-counter";
+			reg = <0x40030000 0x58>;
+			interrupts = <6 0>;
+			status = "disabled";
+		};
+
 	};
 };
 
