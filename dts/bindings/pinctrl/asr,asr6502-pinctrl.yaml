@@ -1,0 +1,37 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  ASR6502 pin controller (HSIOM). Each child node describes one pin as
+  pinmux = <ASR_PINMUX(port, pin, hsiom-sel)> plus optional generic drive/bias
+  properties. Reference the pins from a device via pinctrl-0.
+
+    #include <zephyr/dt-bindings/pinctrl/asr6502-pinctrl.h>
+
+    &pinctrl {
+      uart1_tx: uart1_tx {
+        pinmux = <ASR_PINMUX(4, 0, 9)>;
+        drive-push-pull;
+      };
+      uart1_rx: uart1_rx {
+        pinmux = <ASR_PINMUX(4, 1, 9)>;
+        input-enable;
+      };
+    };
+
+compatible: "asr,asr6502-pinctrl"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
+
+child-binding:
+  description: ASR6502 pin configuration.
+  include: pincfg-node.yaml
+  properties:
+    pinmux:
+      required: true
+      type: array
+      description: Pin routing, packed with ASR_PINMUX(port, pin, hsiom-sel).
