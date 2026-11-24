@@ -1,0 +1,6 @@
+board:
+  name: lht52
+  full_name: Dragino LHT52
+  vendor: asr
+  socs:
+  - name: asr6502

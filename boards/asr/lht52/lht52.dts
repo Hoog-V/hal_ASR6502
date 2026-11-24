@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2025 hal_ASR6502 contributors
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+
+#include <asr/asr6502.dtsi>
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/pinctrl/asr6502-pinctrl.h>
+#include <zephyr/dt-bindings/lora/sx126x.h>
+
+/ {
+	model = "Dragino LHT52";
+	compatible = "asr,lht52";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led0: led_0 {
+			gpios = <&gpio7 0 GPIO_ACTIVE_HIGH>;
+			label = "LED0";
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+
+		button0: button_0 {
+			/* ACT button on P2.2 (per the firmware reverse-engineering). */
+			gpios = <&gpio2 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "ACT";
+			zephyr,code = <INPUT_KEY_0>;
+		};
+	};
+
+	aliases {
+		led0 = &led0;
+		sw0 = &button0;
+		lora0 = &lora0;
+	};
+};
+
+&pinctrl {
+	/* SCB0 SPI to the SX126x radio: SCLK P4.2, MOSI P4.0, MISO P4.1 (HSIOM 15). */
+	spi0_sclk: spi0_sclk {
+		pinmux = <ASR_PINMUX(4, 2, 15)>;
+		drive-push-pull;
+	};
+	spi0_mosi: spi0_mosi {
+		pinmux = <ASR_PINMUX(4, 0, 15)>;
+		drive-push-pull;
+	};
+	spi0_miso: spi0_miso {
+		pinmux = <ASR_PINMUX(4, 1, 15)>;
+		input-enable;
+	};
+};
+
+&gpio4 {
+	status = "okay";
+};
+
+&gpio5 {
+	status = "okay";
+};
+
+/* On-die SX1262 radio on SCB0. Pins per the firmware and the HelTec CubeCell
+ * (same ASR6502 silicon): NSS P4.3, RESET P5.7, BUSY P4.7, DIO1 P4.6.
+ */
+&scb0 {
+	status = "okay";
+	pinctrl-0 = <&spi0_sclk &spi0_mosi &spi0_miso>;
+	pinctrl-names = "default";
+	cs-gpios = <&gpio4 3 GPIO_ACTIVE_LOW>;
+
+	lora0: lora@0 {
+		compatible = "semtech,sx1262";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+		reset-gpios = <&gpio5 7 GPIO_ACTIVE_LOW>;
+		busy-gpios = <&gpio4 7 GPIO_ACTIVE_HIGH>;
+		dio1-gpios = <&gpio4 6 GPIO_ACTIVE_HIGH>;
+		/* Firmware enables SetDio2AsRfSwitchCtrl: the radio drives the
+		 * TX/RX antenna switch from DIO2.
+		 */
+		dio2-tx-enable;
+		/* Firmware configures DIO3 as TCXO control at 1.8 V, 2 ms startup. */
+		dio3-tcxo-voltage = <SX126X_DIO3_TCXO_1V8>;
+		tcxo-power-startup-delay-ms = <2>;
+	};
+};
+
+&gpio2 {
+	status = "okay";
+};
+
+&wdt_counter {
+	status = "okay";
+};
+
+&gpio7 {
+	status = "okay";
+};
+
+/* Battery voltage via the SAR (SARMUX input 0, per the firmware's divider). */
+&adc0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_EXTERNAL0";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <0>;
+	};
+};

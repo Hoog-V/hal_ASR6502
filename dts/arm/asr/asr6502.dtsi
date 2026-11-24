@@ -101,6 +101,10 @@
 			gpio-controller;
 			#gpio-cells = <2>;
 			ngpios = <8>;
+			/* Ports 4-7 share the combined "all ports" interrupt (4). */
+			interrupts = <4 2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
 			status = "disabled";
 		};
 
@@ -130,6 +134,7 @@
 			ngpios = <8>;
 			status = "disabled";
 		};
+
 		adc0: adc@403a0000 {
 			compatible = "asr,asr6502-sar";
 			reg = <0x403a0000 0xf08>;
