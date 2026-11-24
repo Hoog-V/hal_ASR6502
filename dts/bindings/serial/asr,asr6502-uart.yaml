@@ -1,0 +1,23 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  ASR6502 SCB in UART mode (polling, 8N1). TX/RX pins are routed through the
+  pin controller; reference them with pinctrl-0 (see asr,asr6502-pinctrl).
+
+compatible: "asr,asr6502-uart"
+
+include: [uart-controller.yaml, pinctrl-device.yaml]
+
+properties:
+  reg:
+    required: true
+
+  current-speed:
+    required: true
+
+  pinctrl-0:
+    required: true
+
+  pinctrl-names:
+    required: true

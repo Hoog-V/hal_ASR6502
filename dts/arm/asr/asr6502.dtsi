@@ -160,6 +160,33 @@
 			reg = <0x40020000 0x2000>;
 		};
 
+		scb1: uart@40250000 {
+			compatible = "asr,asr6502-uart";
+			reg = <0x40250000 0x10000>;
+			interrupts = <8 0>;
+			status = "disabled";
+		};
+
+		scb2: uart@40260000 {
+			compatible = "asr,asr6502-uart";
+			reg = <0x40260000 0x10000>;
+			interrupts = <9 0>;
+			status = "disabled";
+		};
+
+		scb3: uart@40270000 {
+			compatible = "asr,asr6502-uart";
+			reg = <0x40270000 0x10000>;
+			interrupts = <10 0>;
+			status = "disabled";
+		};
+
+		scb4: uart@40280000 {
+			compatible = "asr,asr6502-uart";
+			reg = <0x40280000 0x10000>;
+			interrupts = <11 0>;
+			status = "disabled";
+		};
 	};
 };
 
