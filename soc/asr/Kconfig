@@ -8,3 +8,4 @@ config SOC_FAMILY_ASR
 	select CPU_CORTEX_M_HAS_VTOR
 	select HAS_ASR6502_SDK
 	select SOC_EARLY_INIT_HOOK
+	select HAS_PM
