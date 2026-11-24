@@ -1,0 +1,12 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config ADC_ASR6502
+	bool "ASR6502 SAR ADC driver"
+	default y
+	depends on ADC
+	depends on DT_HAS_ASR_ASR6502_SAR_ENABLED
+	select ADC_CONFIGURABLE_INPUTS
+	help
+	  Enable the SAR ADC driver for the ASR6502 (single-ended and differential
+	  channels, hardware averaging, interrupt-driven acquisition).

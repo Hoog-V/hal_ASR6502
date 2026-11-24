@@ -130,6 +130,15 @@
 			ngpios = <8>;
 			status = "disabled";
 		};
+		adc0: adc@403a0000 {
+			compatible = "asr,asr6502-sar";
+			reg = <0x403a0000 0xf08>;
+			interrupts = <25 0>;
+			#io-channel-cells = <1>;
+			vref-mv = <3300>;
+			status = "disabled";
+		};
+
 	};
 };
 

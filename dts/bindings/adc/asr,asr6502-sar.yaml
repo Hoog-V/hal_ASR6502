@@ -1,0 +1,43 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  ASR6502 SAR ADC controller.
+
+  Channels are described as child nodes per the Zephyr ADC controller binding;
+  "zephyr,input-positive" (and "zephyr,input-negative" for differential channels)
+  are SARMUX input pin numbers (0..7).
+
+compatible: "asr,asr6502-sar"
+
+include: [adc-controller.yaml, base.yaml]
+
+properties:
+  reg:
+    required: true
+
+  interrupts:
+    required: true
+
+  vref-mv:
+    type: int
+    required: true
+    description: Reference voltage in millivolts, used for raw-to-millivolt conversion.
+
+  vref-sel:
+    type: int
+    default: 0
+    description: |
+      Value for CTRL.VREF_SEL (3-bit). Selects the SAR reference; the encoding is
+      device-specific, see the ASR6502/PSoC 4 datasheet.
+
+  sample-time:
+    type: int
+    default: 20
+    description: Default sample aperture ST0 in ADC clock cycles (10-bit).
+
+  "#io-channel-cells":
+    const: 1
+
+io-channel-cells:
+  - input
