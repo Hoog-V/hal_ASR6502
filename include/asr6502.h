@@ -135,6 +135,56 @@ typedef enum IRQn
 #define ASR_GPIO_INTR_CFG         (0x0CUL)   /* Edge select */
 #define ASR_GPIO_INTR             (0x10UL)   /* Interrupt status */
 
+/* Serial Communication Blocks (SCB): one block every 0x10000, instances 0..4.
+ * Each SCB's clock input is PERI PCLK index n and can use divider n.
+ */
+#define ASR_SCB_BASE(n)           (0x40240000UL + ((n) * 0x10000UL))
+#define ASR_SCB_COUNT             (5U)
+#define ASR_SCB_INSTANCE(base)    (((base) - 0x40240000UL) / 0x10000UL)
+
+#define ASR_SCB_CTRL              (0x0000UL) /* OVS[3:0], MODE[25:24], ENABLED bit31 */
+#define ASR_SCB_SPI_CTRL          (0x0020UL) /* CONTINUOUS b0, CPHA b2, CPOL b3, MASTER b31 */
+#define ASR_SCB_SPI_STATUS        (0x0024UL) /* BUS_BUSY bit0 */
+#define ASR_SCB_UART_CTRL         (0x0040UL) /* MODE[25:24] (0 = standard UART) */
+#define ASR_SCB_UART_TX_CTRL      (0x0044UL) /* STOP_BITS[2:0] */
+#define ASR_SCB_UART_RX_CTRL      (0x0048UL) /* STOP_BITS[2:0] */
+#define ASR_SCB_TX_CTRL           (0x0200UL) /* DATA_WIDTH[3:0] */
+#define ASR_SCB_TX_FIFO_CTRL      (0x0204UL)
+#define ASR_SCB_TX_FIFO_STATUS    (0x0208UL) /* USED[8:0] */
+#define ASR_SCB_TX_FIFO_WR        (0x0240UL)
+#define ASR_SCB_RX_CTRL           (0x0300UL) /* DATA_WIDTH[3:0] */
+#define ASR_SCB_RX_FIFO_CTRL      (0x0304UL)
+#define ASR_SCB_RX_FIFO_STATUS    (0x0308UL) /* USED[8:0] */
+#define ASR_SCB_RX_FIFO_RD        (0x0340UL)
+
+#define ASR_SCB_CTRL_MODE_UART    (2UL << 24)
+#define ASR_SCB_CTRL_MODE_SPI     (1UL << 24)
+#define ASR_SCB_CTRL_ENABLED_Msk  (0x80000000UL)
+#define ASR_SCB_FIFO_USED_Msk     (0x1FFUL)
+#define ASR_SCB_FIFO_DEPTH        (8U)       /* conservative lower bound */
+
+#define ASR_SCB_SPI_CTRL_CONTINUOUS_Msk (0x1UL)
+#define ASR_SCB_SPI_CTRL_CPHA_Msk       (0x4UL)
+#define ASR_SCB_SPI_CTRL_CPOL_Msk       (0x8UL)
+#define ASR_SCB_SPI_CTRL_MASTER_Msk     (0x80000000UL)
+#define ASR_SCB_SPI_STATUS_BUS_BUSY_Msk (0x1UL)
+#define ASR_SCB_CTRL_MSB_FIRST_Msk      (0x80000000UL) /* in TX_CTRL/RX_CTRL */
+
+/* PERI programmable clock dividers (from ASR_PERI_BASE). Divider divides the
+ * input (HFCLK) by (value + 1); 16.0 integer type = 1.
+ */
+#define ASR_PERI_DIV_CMD          (0x0000UL)
+#define ASR_PERI_PCLK_CTL(i)      (0x0100UL + ((i) * 4UL))
+#define ASR_PERI_DIV_16_CTL(i)    (0x0300UL + ((i) * 4UL))
+#define ASR_PERI_DIV_16_INT_Pos   (8U)       /* INT16_DIV[23:8] */
+#define ASR_PERI_DIV_TYPE_16      (1UL)
+#define ASR_PERI_DIV_CMD_ENABLE_Msk (0x80000000UL)
+#define ASR_PERI_PCLK_SEL_TYPE_Pos  (6U)
+#define ASR_PERI_DIV_CMD_SEL_TYPE_Pos (6U)
+#define ASR_PERI_DIV_CMD_PA_SEL_DIV_Pos  (8U)
+#define ASR_PERI_DIV_CMD_PA_SEL_TYPE_Pos (14U)
+#define ASR_PERI_DIV_CMD_PA_NONE  ((0x3FUL << 8) | (3UL << 14)) /* no phase align */
+
 /* SAR ADC register offsets (from ASR_SAR_BASE). CHAN_CONFIG/CHAN_RESULT are [16]. */
 #define ASR_SAR_CTRL              (0x0000UL) /* Analog control: ENABLED bit31, VREF_SEL[6:4] */
 #define ASR_SAR_SAMPLE_CTRL       (0x0004UL) /* Sample control: CONTINUOUS bit16 */
@@ -147,12 +197,59 @@ typedef enum IRQn
 #define ASR_SAR_INTR_MASK         (0x0218UL) /* EOS interrupt mask bit0 */
 #define ASR_SAR_MUX_SWITCH0       (0x0300UL) /* FW switches: Pn->Vplus bit n, VSSA->Vminus bit16 */
 
+/* SAR field positions/masks. */
+#define ASR_SAR_CTRL_VREF_SEL_Pos          (4U)
+#define ASR_SAR_CTRL_VREF_SEL_Msk          (0x70UL)
+#define ASR_SAR_CTRL_NEG_SEL_Pos           (9U)
+#define ASR_SAR_CTRL_NEG_SEL_Msk           (0xE00UL)
+#define ASR_SAR_CTRL_ENABLED_Msk           (0x80000000UL)
+
+#define ASR_SAR_SAMPLE_CTRL_SUB_RES_Pos    (0U)      /* 0=12-bit, else reduced */
+#define ASR_SAR_SAMPLE_CTRL_LEFT_ALIGN_Msk (0x2UL)
+#define ASR_SAR_SAMPLE_CTRL_SE_SIGNED_Msk  (0x4UL)
+#define ASR_SAR_SAMPLE_CTRL_DIFF_SIGNED_Msk (0x8UL)
+#define ASR_SAR_SAMPLE_CTRL_AVG_CNT_Pos    (4U)
+#define ASR_SAR_SAMPLE_CTRL_AVG_CNT_Msk    (0x70UL)
+#define ASR_SAR_SAMPLE_CTRL_AVG_SHIFT_Msk  (0x80UL)
+#define ASR_SAR_SAMPLE_CTRL_CONTINUOUS_Msk (0x10000UL)
+
+#define ASR_SAR_CHAN_CONFIG_PIN_ADDR_Pos   (0U)
+#define ASR_SAR_CHAN_CONFIG_PIN_ADDR_Msk   (0x7UL)
+#define ASR_SAR_CHAN_CONFIG_PORT_ADDR_Pos  (4U)
+#define ASR_SAR_CHAN_CONFIG_PORT_ADDR_Msk  (0x70UL)
+#define ASR_SAR_CHAN_CONFIG_DIFF_EN_Msk    (0x100UL)
+#define ASR_SAR_CHAN_CONFIG_RESOLUTION_Msk (0x200UL) /* 1 = use reduced sub-resolution */
+#define ASR_SAR_CHAN_CONFIG_AVG_EN_Msk     (0x400UL)
+#define ASR_SAR_CHAN_CONFIG_ST_SEL_Pos     (12U)
+#define ASR_SAR_CHAN_CONFIG_ST_SEL_Msk     (0x3000UL)
+
+#define ASR_SAR_SAMPLE_TIME0_Msk           (0x3FFUL)
+#define ASR_SAR_INTR_EOS_Msk               (0x1UL)
+#define ASR_SAR_MUX_VSSA_VMINUS_Msk        (0x10000UL)
+
 /***********************************************************************************************************************
  * SRSSLT clock registers (offsets from ASR_SRSSLT_BASE)
  **********************************************************************************************************************/
 
+#define ASR_SRSSLT_PWR_CONTROL        (0x0000UL) /* Power-mode control/status */
 #define ASR_SRSSLT_CLK_SELECT         (0x0028UL) /* HFCLK source/divider, SYSCLK divider */
+#define ASR_SRSSLT_CLK_ILO_CONFIG     (0x002CUL) /* ILO enable (bit31) */
 #define ASR_SRSSLT_CLK_IMO_CONFIG     (0x0030UL) /* IMO enable */
+#define ASR_SRSSLT_WDT_DISABLE_KEY    (0x0038UL) /* Write 0xACED8865 to disable WDT reset */
+#define ASR_SRSSLT_WDT_COUNTER        (0x003CUL) /* Free-running 16-bit ILO counter (RO) */
+#define ASR_SRSSLT_WDT_MATCH          (0x0040UL) /* MATCH[15:0], IGNORE_BITS[19:16] */
+#define ASR_SRSSLT_SRSS_INTR          (0x0044UL) /* WDT_MATCH bit0 (W1C) */
+#define ASR_SRSSLT_SRSS_INTR_MASK     (0x004CUL) /* WDT_MATCH interrupt mask bit0 */
+#define ASR_SRSSLT_RES_CAUSE          (0x0054UL) /* Reset cause */
+
+#define ASR_WDT_DISABLE_KEY           (0xACED8865UL)
+#define ASR_SRSS_INTR_WDT_MATCH_Msk   (0x1UL)
+#define ASR_RES_CAUSE_WDT_Msk         (0x1UL)
+#define ASR_RES_CAUSE_PROT_FAULT_Msk  (0x8UL)
+#define ASR_RES_CAUSE_SOFT_Msk        (0x10UL)
+
+/* SFLASH identification. */
+#define ASR_SFLASH_SILICON_ID         (0x0144UL)
 #define ASR_SRSSLT_CLK_IMO_SELECT     (0x0F08UL) /* IMO frequency field */
 #define ASR_SRSSLT_CLK_IMO_TRIM1      (0x0F0CUL) /* IMO coarse trim */
 #define ASR_SRSSLT_CLK_IMO_TRIM2      (0x0F10UL) /* IMO fine trim */
@@ -167,6 +264,10 @@ typedef enum IRQn
 #define ASR_CLK_IMO_SELECT_FREQ_Pos   (0U)
 #define ASR_CLK_IMO_SELECT_FREQ_Msk   (0x7UL)
 #define ASR_CLK_IMO_CONFIG_ENABLE_Msk (0x80000000UL)
+#define ASR_CLK_ILO_CONFIG_ENABLE_Msk (0x80000000UL)
+
+/* ILO (internal low-speed oscillator) nominal frequency. */
+#define ASR_CLK_ILO_FREQ_HZ           (40000UL)
 
 /* SFLASH IMO trim tables (uint8_t[25], indexed by (imo_hz - 24 MHz) / 1 MHz). */
 #define ASR_SFLASH_IMO_TCTRIM_LT      (0x01CCUL)
