@@ -1,0 +1,14 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  ASR6502 watchdog (ILO-clocked WDT). Shares hardware with the counter driver;
+  enable only one of them.
+
+compatible: "asr,asr6502-watchdog"
+
+include: [base.yaml]
+
+properties:
+  reg:
+    required: true

@@ -146,6 +146,15 @@
 			status = "disabled";
 		};
 
+		/* Alternative role for the same WDT hardware; enable either this
+		 * or wdt_counter, never both.
+		 */
+		watchdog0: watchdog@40030038 {
+			compatible = "asr,asr6502-watchdog";
+			reg = <0x40030038 0x20>;
+			status = "disabled";
+		};
+
 	};
 };
 

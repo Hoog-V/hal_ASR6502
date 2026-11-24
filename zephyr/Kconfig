@@ -9,3 +9,4 @@ config HAS_ASR6502_SDK
 rsource "../drivers/gpio/Kconfig"
 rsource "../drivers/adc/Kconfig"
 rsource "../drivers/counter/Kconfig"
+rsource "../drivers/watchdog/Kconfig"
