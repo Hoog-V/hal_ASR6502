@@ -100,3 +100,31 @@ uint32_t asr_clock_sysclk_get(void)
 {
     return SystemCoreClock;
 }
+
+uint32_t asr_clock_hfclk_get(void)
+{
+    uint32_t sel = ASR_SRSSLT_REG(ASR_SRSSLT_CLK_SELECT);
+    uint32_t hfclk_div;
+
+    if (((sel & ASR_CLK_SELECT_HFCLK_SEL_Msk) >> ASR_CLK_SELECT_HFCLK_SEL_Pos) != 0U) {
+        return 0U;   /* external source: rate unknown to the HAL */
+    }
+
+    hfclk_div = (sel & ASR_CLK_SELECT_HFCLK_DIV_Msk) >> ASR_CLK_SELECT_HFCLK_DIV_Pos;
+
+    return asr_clock_imo_freq_hz() >> hfclk_div;
+}
+
+void asr_clock_ilo_enable(bool enable)
+{
+    if (enable) {
+        ASR_SRSSLT_REG(ASR_SRSSLT_CLK_ILO_CONFIG) |= ASR_CLK_ILO_CONFIG_ENABLE_Msk;
+    } else {
+        ASR_SRSSLT_REG(ASR_SRSSLT_CLK_ILO_CONFIG) &= ~ASR_CLK_ILO_CONFIG_ENABLE_Msk;
+    }
+}
+
+bool asr_clock_ilo_is_enabled(void)
+{
+    return (ASR_SRSSLT_REG(ASR_SRSSLT_CLK_ILO_CONFIG) & ASR_CLK_ILO_CONFIG_ENABLE_Msk) != 0U;
+}

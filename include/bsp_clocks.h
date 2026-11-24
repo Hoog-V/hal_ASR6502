@@ -14,6 +14,7 @@
 #ifndef BSP_CLOCKS_H
 #define BSP_CLOCKS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -70,6 +71,17 @@ void asr_clock_imo_set_freq(asr_clock_imo_freq_t freq);
 
 /* Current SYSCLK (SystemCoreClock) in Hz. */
 uint32_t asr_clock_sysclk_get(void);
+
+/* HFCLK frequency in Hz (IMO after the HFCLK divider, ahead of the SYSCLK divider);
+ * 0 for an external HFCLK source whose rate is not known to the HAL. */
+uint32_t asr_clock_hfclk_get(void);
+
+/* Enable or disable the ILO (internal low-speed oscillator, ~40 kHz). The ILO
+ * clocks the watchdog and is available as a wake source in deep sleep. */
+void asr_clock_ilo_enable(bool enable);
+
+/* True if the ILO is running. */
+bool asr_clock_ilo_is_enabled(void);
 
 #ifdef __cplusplus
 }
