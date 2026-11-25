@@ -11,6 +11,7 @@
 #define DT_DRV_COMPAT asr_asr6502_spi
 
 #include <zephyr/device.h>
+#include <zephyr/kernel.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/pinctrl.h>
 #include <zephyr/logging/log.h>
@@ -25,6 +26,10 @@ LOG_MODULE_REGISTER(spi_asr6502, CONFIG_SPI_LOG_LEVEL);
 
 /* SPI SCLK = HFCLK / peridiv / OVS. Fixed OVS keeps the math simple. */
 #define SPI_OVS 8U
+
+/* Upper bound on one byte's FIFO round-trip, far above the ~1-80 us a byte
+ * takes on the wire: a real transfer never trips it, a wedged SCB does. */
+#define SPI_XFER_TIMEOUT_US 10000U
 
 struct spi_asr6502_config {
 	uint32_t base;
@@ -102,16 +107,25 @@ static int spi_asr6502_configure(const struct spi_asr6502_config *cfg,
 	return 0;
 }
 
-static uint8_t spi_asr6502_transfer_byte(uint32_t base, uint8_t out)
+static int spi_asr6502_transfer_byte(uint32_t base, uint8_t out, uint8_t *in)
 {
+	uint32_t deadline = k_cycle_get_32() + k_us_to_cyc_ceil32(SPI_XFER_TIMEOUT_US);
+
 	while ((REG(base + ASR_SCB_TX_FIFO_STATUS) & ASR_SCB_FIFO_USED_Msk) >=
 	       ASR_SCB_FIFO_DEPTH) {
+		if ((int32_t)(k_cycle_get_32() - deadline) >= 0) {
+			return -ETIMEDOUT;
+		}
 	}
 	REG(base + ASR_SCB_TX_FIFO_WR) = out;
 
 	while ((REG(base + ASR_SCB_RX_FIFO_STATUS) & ASR_SCB_FIFO_USED_Msk) == 0U) {
+		if ((int32_t)(k_cycle_get_32() - deadline) >= 0) {
+			return -ETIMEDOUT;
+		}
 	}
-	return (uint8_t)REG(base + ASR_SCB_RX_FIFO_RD);
+	*in = (uint8_t)REG(base + ASR_SCB_RX_FIFO_RD);
+	return 0;
 }
 
 static int spi_asr6502_transceive(const struct device *dev,
@@ -136,7 +150,12 @@ static int spi_asr6502_transceive(const struct device *dev,
 
 	while (spi_context_tx_buf_on(ctx) || spi_context_rx_buf_on(ctx)) {
 		uint8_t out = spi_context_tx_buf_on(ctx) ? *ctx->tx_buf : 0U;
-		uint8_t in = spi_asr6502_transfer_byte(cfg->base, out);
+		uint8_t in;
+
+		ret = spi_asr6502_transfer_byte(cfg->base, out, &in);
+		if (ret < 0) {
+			break;
+		}
 
 		if (spi_context_rx_buf_on(ctx)) {
 			*ctx->rx_buf = in;
