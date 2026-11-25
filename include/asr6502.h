@@ -168,7 +168,7 @@ typedef enum IRQn
 #define ASR_SCB_SPI_CTRL_CPOL_Msk       (0x8UL)
 #define ASR_SCB_SPI_CTRL_MASTER_Msk     (0x80000000UL)
 #define ASR_SCB_SPI_STATUS_BUS_BUSY_Msk (0x1UL)
-#define ASR_SCB_CTRL_MSB_FIRST_Msk      (0x80000000UL) /* in TX_CTRL/RX_CTRL */
+#define ASR_SCB_CTRL_MSB_FIRST_Msk      (0x100UL) /* bit 8 in TX_CTRL/RX_CTRL */
 
 /* PERI programmable clock dividers (from ASR_PERI_BASE). Divider divides the
  * input (HFCLK) by (value + 1); 16.0 integer type = 1.
