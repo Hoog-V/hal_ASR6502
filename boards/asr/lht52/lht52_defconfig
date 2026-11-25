@@ -1,4 +1,12 @@
+# Minimal board base. Apps enable the peripherals they actually use
+# (CONFIG_ADC, CONFIG_I2C/_GPIO, CONFIG_COUNTER, CONFIG_HWINFO, ...) in their
+# own prj.conf, so each image only pays RAM/flash for what it needs.
+
+# Console/logging over the J-Link (SEGGER RTT) — no UART is broken out.
+CONFIG_CONSOLE=y
+CONFIG_RTT_CONSOLE=y
+CONFIG_USE_SEGGER_RTT=y
+CONFIG_UART_CONSOLE=n
+
+# GPIO: on-board LED (P7.0) and ACT button (P2.2), plus the radio control pins.
 CONFIG_GPIO=y
-CONFIG_ADC=y
-CONFIG_COUNTER=y
-CONFIG_HWINFO=y
