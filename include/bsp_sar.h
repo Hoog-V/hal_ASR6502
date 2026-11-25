@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * SAR ADC driver for the ASR6502: single-ended, firmware-triggered one-shot
+ * SAR ADC driver for the ASR6502: single-ended, software-triggered one-shot
  * conversions. A channel samples a SARMUX input pin against VSSA.
  */
 
