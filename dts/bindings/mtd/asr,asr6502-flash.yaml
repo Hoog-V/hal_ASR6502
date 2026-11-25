@@ -1,0 +1,12 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: ASR6502 (PSoC4100S+) internal flash controller
+
+compatible: "asr,asr6502-flash"
+
+include: flash-controller.yaml
+
+properties:
+  reg:
+    required: true

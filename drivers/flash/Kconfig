@@ -1,0 +1,12 @@
+# Copyright (c) 2025 hal_ASR6502 contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config FLASH_ASR6502
+	bool "ASR6502 internal flash driver"
+	default y
+	depends on FLASH
+	depends on DT_HAS_ASR_ASR6502_FLASH_ENABLED
+	select FLASH_HAS_PAGE_LAYOUT
+	select FLASH_HAS_DRIVER_ENABLED
+	help
+	  Internal flash program/erase via the PSoC4 SROM system calls.
