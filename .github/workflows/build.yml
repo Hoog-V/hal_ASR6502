@@ -34,7 +34,7 @@ jobs:
         run: sg lxd -c 'workshop launch ci'
 
       - name: Fetch Zephyr and modules
-        run: sg lxd -c 'workshop run -I setup'
+        run: sg lxd -c 'workshop run -I -- setup'
 
       - name: Build LHT52 driver image
-        run: sg lxd -c 'workshop run -I build'
+        run: sg lxd -c 'workshop run -I -- build'
