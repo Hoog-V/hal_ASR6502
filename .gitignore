@@ -63,3 +63,4 @@ dkms.conf
 /bootloader/
 /build*/
 .workshop.lock
+_sdk-*.tgz

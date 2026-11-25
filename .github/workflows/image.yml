@@ -1,0 +1,50 @@
+name: image
+
+# Rebuild and push the CI base image. Rarely needed - only when the SDK pin,
+# the manifest, or the Dockerfile change. The regular build workflow just pulls
+# the result.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ci/**
+      - west.yml
+      - .workshop/**
+      - .github/workflows/image.yml
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: hal_ASR6502
+
+      - name: Install LXD and Workshop
+        run: |
+          sudo snap install lxd
+          sudo lxd init --auto
+          sudo lxd waitready
+          # Docker on the runner sets FORWARD to DROP; LXD containers need it.
+          sudo iptables -P FORWARD ACCEPT
+          sudo snap install workshop --classic
+          sudo usermod -aG lxd "$USER"
+
+      - name: Stage workshop project
+        run: cp -r hal_ASR6502/.workshop .workshop
+
+      - name: Launch workshop
+        run: sg lxd -c 'workshop launch ci'
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push image
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          sg lxd -c "IMAGE=ghcr.io/$owner/hal_asr6502-ci:latest PUSH=1 hal_ASR6502/ci/build-image.sh"

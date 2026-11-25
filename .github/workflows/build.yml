@@ -7,34 +7,20 @@ on:
 jobs:
   lht52:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/hoog-v/hal_asr6502-ci:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: hal_ASR6502
-
-      - name: Install LXD and Workshop
-        run: |
-          sudo snap install lxd
-          sudo lxd init --auto
-          sudo lxd waitready
-          # GitHub runners ship Docker, which sets the iptables FORWARD policy
-          # to DROP; LXD containers need forwarding on their bridge to reach the
-          # apt archives the SDK setup hooks install from.
-          sudo iptables -P FORWARD ACCEPT
-          sudo snap install workshop --classic
-          sudo usermod -aG lxd "$USER"
-
-      # Workshop reads its definition from the project's .workshop/ dir; the
-      # west workspace is assembled next to the repo under this same dir.
-      - name: Stage workshop project
-        run: cp -r hal_ASR6502/.workshop .workshop
-
-      - name: Launch workshop
-        run: sg lxd -c 'workshop launch ci'
-
-      - name: Fetch Zephyr and modules
-        run: sg lxd -c 'workshop run -I -- setup'
 
       - name: Build LHT52 driver image
-        run: sg lxd -c 'workshop run -I -- build'
+        run: |
+          # The image bakes the Zephyr workspace at /workspace; drop this repo
+          # in as the manifest self project and build.
+          mkdir -p /workspace/hal_ASR6502
+          cp -a "$GITHUB_WORKSPACE/." /workspace/hal_ASR6502/
+          cd /workspace
+          west build -b lht52 hal_ASR6502/tests/build
