@@ -1,16 +1,17 @@
 name: image
 
-# Rebuild and push the CI base image. Rarely needed - only when the SDK pin,
-# the manifest, or the Dockerfile change. The regular build workflow just pulls
-# the result.
+# Rebuild and push the CI base image. Only runs on manual dispatch or when the
+# files that actually define the image change - the Dockerfile, the build
+# script, the module pins, or the SDK channels - not on unrelated edits to this
+# workflow. The regular build workflow just pulls the result.
 on:
   workflow_dispatch:
   push:
     paths:
-      - ci/**
+      - ci/Dockerfile
+      - ci/build-image.sh
       - west.yml
-      - .workshop/**
-      - .github/workflows/image.yml
+      - .workshop/ci.yaml
 
 permissions:
   contents: read
@@ -52,3 +53,10 @@ jobs:
         run: |
           owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           sg lxd -c "IMAGE=ghcr.io/$owner/hal_asr6502-ci:latest PUSH=1 hal_ASR6502/ci/build-image.sh"
+
+      - name: Prune old image versions (keep 3)
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: hal_asr6502-ci
+          package-type: container
+          min-versions-to-keep: 3
