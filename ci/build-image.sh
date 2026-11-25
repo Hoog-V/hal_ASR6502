@@ -47,7 +47,11 @@ done
 
 echo ">> Building $IMAGE with $TOOL"
 cp hal_ASR6502/ci/Dockerfile "$CTX/Dockerfile"
-"$TOOL" build -t "$IMAGE" "$CTX"
+# Docker/buildx attaches provenance attestations by default, which GHCR rejects
+# on push ("denied" after the layers upload); build a plain image instead.
+build_args=()
+[ "$TOOL" = docker ] && build_args+=(--provenance=false)
+"$TOOL" build "${build_args[@]}" -t "$IMAGE" "$CTX"
 
 if [ "${PUSH:-0}" = "1" ]; then
   echo ">> Pushing $IMAGE"
