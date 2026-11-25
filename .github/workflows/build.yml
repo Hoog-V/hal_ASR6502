@@ -1,0 +1,35 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lht52:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: hal_ASR6502
+
+      - name: Install LXD and Workshop
+        run: |
+          sudo snap install lxd
+          sudo lxd init --auto
+          sudo snap install workshop --classic
+          sudo usermod -aG lxd "$USER"
+
+      # Workshop reads its definition from the project's .workshop/ dir; the
+      # west workspace is assembled next to the repo under this same dir.
+      - name: Stage workshop project
+        run: cp -r hal_ASR6502/.workshop .workshop
+
+      - name: Launch workshop
+        run: sg lxd -c 'workshop launch ci'
+
+      - name: Fetch Zephyr and modules
+        run: sg lxd -c 'workshop run -I setup'
+
+      - name: Build LHT52 driver image
+        run: sg lxd -c 'workshop run -I build'

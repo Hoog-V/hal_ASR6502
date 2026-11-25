@@ -1,0 +1,35 @@
+name: ci
+base: ubuntu@26.04
+runtime: lxd-container
+
+sdks:
+  - name: uv
+    channel: latest/stable
+  - name: zephyr
+    channel: 26.10/stable
+  - name: zephyr-sdk-ng
+    channel: 26.10.0/stable
+  - name: zephyr-arm
+    channel: 26.10.0/stable
+
+connections:
+  - plug: zephyr:venv
+    slot: uv:venv
+  - plug: zephyr:sdk-ng
+    slot: zephyr-sdk-ng:sdk-ng
+  - plug: zephyr-sdk-ng:arm
+    slot: zephyr-arm:toolchain
+
+actions:
+  # Assemble the west workspace: the checked-out repo at /project/hal_ASR6502 is
+  # the manifest, Zephyr + the three modules are fetched shallow next to it.
+  setup: |
+    source /var/lib/workshop/sdk/zephyr/venv/bin/activate
+    cd /project
+    west init -l hal_ASR6502 2>/dev/null || true
+    west update --narrow -o=--depth=1
+  # Compile-test the HAL drivers for the LHT52 board.
+  build: |
+    source /var/lib/workshop/sdk/zephyr/venv/bin/activate
+    cd /project
+    west build -b lht52 hal_ASR6502/tests/build "$@"
