@@ -19,6 +19,7 @@
 	chosen {
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
 	};
 
 	leds {
@@ -34,7 +35,7 @@
 		compatible = "gpio-keys";
 
 		button0: button_0 {
-			/* ACT button on P2.2 (per the firmware reverse-engineering). */
+			/* ACT button on P2.2. */
 			gpios = <&gpio2 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "ACT";
 			zephyr,code = <INPUT_KEY_0>;
@@ -45,7 +46,25 @@
 		led0 = &led0;
 		sw0 = &button0;
 		lora0 = &lora0;
+		i2c0 = &i2c0;
 	};
+
+	/* SHT temp/humidity sensor on P0.0 (SCL) / P0.1 (SDA), bit-banged.
+	 * Relies on the board's external I2C pull-ups.
+	 */
+	i2c0: i2c-gpio {
+		compatible = "gpio-i2c";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clock-frequency = <100000>;
+		scl-gpios = <&gpio0 0 GPIO_OPEN_DRAIN>;
+		sda-gpios = <&gpio0 1 GPIO_OPEN_DRAIN>;
+		status = "okay";
+	};
+};
+
+&gpio0 {
+	status = "okay";
 };
 
 &pinctrl {
@@ -72,9 +91,7 @@
 	status = "okay";
 };
 
-/* On-die SX1262 radio on SCB0. Pins per the firmware and the HelTec CubeCell
- * (same ASR6502 silicon): NSS P4.3, RESET P5.7, BUSY P4.7, DIO1 P4.6.
- */
+/* On-die SX1262 radio on SCB0: NSS P4.3, RESET P5.7, BUSY P4.7, DIO1 P4.6. */
 &scb0 {
 	status = "okay";
 	pinctrl-0 = <&spi0_sclk &spi0_mosi &spi0_miso>;
@@ -88,13 +105,11 @@
 		reset-gpios = <&gpio5 7 GPIO_ACTIVE_LOW>;
 		busy-gpios = <&gpio4 7 GPIO_ACTIVE_HIGH>;
 		dio1-gpios = <&gpio4 6 GPIO_ACTIVE_HIGH>;
-		/* Firmware enables SetDio2AsRfSwitchCtrl: the radio drives the
-		 * TX/RX antenna switch from DIO2.
-		 */
+		/* The radio drives the TX/RX antenna switch from DIO2. */
 		dio2-tx-enable;
-		/* Firmware configures DIO3 as TCXO control at 1.8 V, 2 ms startup. */
+		/* DIO3 controls the TCXO at 1.8 V with a 5 ms startup delay. */
 		dio3-tcxo-voltage = <SX126X_DIO3_TCXO_1V8>;
-		tcxo-power-startup-delay-ms = <2>;
+		tcxo-power-startup-delay-ms = <5>;
 	};
 };
 
@@ -110,7 +125,7 @@
 	status = "okay";
 };
 
-/* Battery voltage via the SAR (SARMUX input 0, per the firmware's divider). */
+/* Battery voltage via the SAR (SARMUX input 0). */
 &adc0 {
 	status = "okay";
 	#address-cells = <1>;
@@ -122,5 +137,27 @@
 		zephyr,reference = "ADC_REF_EXTERNAL0";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,input-positive = <0>;
+	};
+};
+
+/* Flash layout for FUOTA / OTA: running image, download slot, and NVS. */
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		slot0_partition: partition@0 {
+			label = "image-0";
+			reg = <0x00000000 0x0000C000>;
+		};
+		slot1_partition: partition@c000 {
+			label = "image-1";
+			reg = <0x0000C000 0x0000C000>;
+		};
+		storage_partition: partition@18000 {
+			label = "storage";
+			reg = <0x00018000 0x00008000>;
+		};
 	};
 };
